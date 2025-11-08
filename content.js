@@ -92,7 +92,6 @@ function handleInput(inputElement) {
   
   // Get text before and after cursor
   const textBeforeCursor = text.substring(0, cursorPosition);
-  const textAfterCursor = text.substring(cursorPosition);
   
   // Find the last word being typed (from last space or start of text)
   const lastWordMatch = textBeforeCursor.match(/[^\s]*$/);
@@ -100,7 +99,12 @@ function handleInput(inputElement) {
   
   const matches = shortcuts.filter(s => {
     // Check for exact shortcut key match before cursor
-    const keyMatch = s.key.length > 0 && textBeforeCursor.endsWith(s.key);
+    let keyMatch = false
+    if (s.key.length == 1) {
+      keyMatch = s.key.length > 0 && textBeforeCursor.endsWith(s.key);
+    } else {
+      keyMatch = lastWord.length >= 2 && s.key.toLowerCase().startsWith(lastWord);
+    }
     
     // Check if the last word matches the beginning of the sentence
     // Only match if we have at least 2 characters to avoid too many matches
