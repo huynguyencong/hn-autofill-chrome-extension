@@ -23,12 +23,13 @@ function createShortcutEntry(key = '', text = '', index) {
   keyInput.type = 'text';
   keyInput.placeholder = 'Shortcut key';
   keyInput.value = key;
-  keyInput.style.width = '100px';
+  keyInput.className = 'key-input';
   
   const textInput = document.createElement('input');
   textInput.type = 'text';
   textInput.placeholder = 'Text to insert';
   textInput.value = text;
+  textInput.className = 'text-input';
   
   const deleteBtn = document.createElement('button');
   deleteBtn.textContent = 'Delete';
