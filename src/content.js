@@ -125,12 +125,12 @@ function handleInput(inputElement) {
     
     if (normalizedLastWords.length >= 2) {
       // 1. Beginning of sentence
-      const startMatch = normalizedSearchText.startsWith(normalizedLastWord);
+      const startMatch = normalizedLastWord.length >= 2 && normalizedSearchText.startsWith(normalizedLastWord);
       
       // 2. Two consecutive words anywhere in the sentence
       const twoWordMatch = normalizedLastWords.includes(' ') && normalizedSearchText.includes(normalizedLastWords);
       
-      // 3. Single word match the prefix
+      // 3. Single word matches the prefix
       const singleWordMatch = !normalizedLastWords.includes(' ') 
         && normalizedLastWord.length >= 2 
         && normalizedSearchText.startsWith(normalizedLastWord);
