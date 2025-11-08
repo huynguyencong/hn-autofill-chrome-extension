@@ -86,6 +86,11 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Helper function to remove special characters for matching
+function normalizeText(text) {
+  return text.replace(/[^a-z0-9\s]/gi, '').toLowerCase();
+}
+
 function handleInput(inputElement) {
   currentInput = inputElement;
   const text = inputElement.value;
@@ -100,6 +105,10 @@ function handleInput(inputElement) {
   const lastWords = lastTwoWordsMatch ? lastTwoWordsMatch[0].toLowerCase().trim() : '';
   const lastWord = lastWords.split(/\s+/).pop() || '';
   
+  // Normalize text for matching (remove special characters)
+  const normalizedLastWords = normalizeText(lastWords);
+  const normalizedLastWord = normalizeText(lastWord);
+  
   const matches = shortcuts.filter(s => {
     // Check for exact shortcut key match before cursor
     let keyMatch = false;
@@ -112,45 +121,48 @@ function handleInput(inputElement) {
     // Check for matches in the sentence
     let textMatch = false;
     const searchText = s.text.toLowerCase();
+    const normalizedSearchText = normalizeText(s.text);
     
-    if (lastWords.length >= 2) {
+    if (normalizedLastWords.length >= 2) {
       // 1. Beginning of sentence
-      const startMatch = searchText.startsWith(lastWord);
+      const startMatch = normalizedSearchText.startsWith(normalizedLastWord);
       
       // 2. Two consecutive words anywhere in the sentence
-      const twoWordMatch = lastWords.includes(' ') && searchText.includes(lastWords);
+      const twoWordMatch = normalizedLastWords.includes(' ') && normalizedSearchText.includes(normalizedLastWords);
       
       // 3. Single word match the prefix
-      const singleWordMatch = !lastWords.includes(' ') 
-        && lastWord.length >= 2 
-        && searchText.startsWith(lastWord);
+      const singleWordMatch = !normalizedLastWords.includes(' ') 
+        && normalizedLastWord.length >= 2 
+        && normalizedSearchText.startsWith(normalizedLastWord);
       
       textMatch = startMatch || twoWordMatch || singleWordMatch;
     }
 
     // 4. Abbreviation match (e.g., "hbt" matches "Happy Birthday To you")
     let abbreviationMatch = false;
-    if (lastWord.length >= 3 && !lastWords.includes(' ')) {
+    if (normalizedLastWord.length >= 3 && !normalizedLastWords.includes(' ')) {
       const words = s.text.split(/\s+/);
       let letterIndex = 0;
       let matchedLetters = '';
       
       // Try to match input characters with first letters of words
       for (const word of words) {
-        if (letterIndex < lastWord.length && 
-            word.charAt(0).toLowerCase() === lastWord[letterIndex].toLowerCase()) {
-          matchedLetters += word.charAt(0).toLowerCase();
+        const normalizedWord = normalizeText(word);
+        if (normalizedWord.length > 0 && letterIndex < normalizedLastWord.length && 
+            normalizedWord.charAt(0) === normalizedLastWord[letterIndex]) {
+          matchedLetters += normalizedWord.charAt(0);
           letterIndex++;
         }
       }
       
       // Also try matching consecutive characters from the start of any word
       const wordStartMatches = words.some(word => {
-        const firstChars = word.slice(0, lastWord.length).toLowerCase();
-        return firstChars === lastWord.toLowerCase();
+        const normalizedWord = normalizeText(word);
+        const firstChars = normalizedWord.slice(0, normalizedLastWord.length);
+        return firstChars === normalizedLastWord;
       });
       
-      abbreviationMatch = matchedLetters === lastWord.toLowerCase() || wordStartMatches;
+      abbreviationMatch = matchedLetters === normalizedLastWord || wordStartMatches;
     }
     
     return keyMatch || textMatch || abbreviationMatch;
