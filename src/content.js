@@ -95,25 +95,41 @@ function handleInput(inputElement) {
   // Get text before and after cursor
   const textBeforeCursor = text.substring(0, cursorPosition);
   
-  // Find the last word being typed (from last space or start of text)
-  const lastWordMatch = textBeforeCursor.match(/[^\s]*$/);
-  const lastWord = lastWordMatch ? lastWordMatch[0].toLowerCase() : '';
+  // Get the last two words being typed
+  const lastTwoWordsMatch = textBeforeCursor.match(/(?:[^\s]+\s+)?[^\s]*$/);
+  const lastWords = lastTwoWordsMatch ? lastTwoWordsMatch[0].toLowerCase().trim() : '';
+  const lastWord = lastWords.split(/\s+/).pop() || '';
   
   const matches = shortcuts.filter(s => {
     // Check for exact shortcut key match before cursor
-    let keyMatch = false
+    let keyMatch = false;
     if (s.key.length == 1) {
       keyMatch = s.key.length > 0 && textBeforeCursor.endsWith(s.key);
     } else {
       keyMatch = lastWord.length >= 2 && s.key.toLowerCase().startsWith(lastWord);
     }
     
-    // Check if the last word matches the beginning of the sentence
-    // Only match if we have at least 2 characters to avoid too many matches
-    const prefixMatch = lastWord.length >= 2 && 
-                       s.text.toLowerCase().startsWith(lastWord);
+    // Check for matches in the sentence
+    let textMatch = false;
+    if (lastWords.length >= 2) {
+      const searchText = s.text.toLowerCase();
+      
+      // Match scenarios:
+      // 1. Beginning of sentence (as before)
+      const startMatch = searchText.startsWith(lastWord);
+      
+      // 2. Two consecutive words anywhere in the sentence
+      const twoWordMatch = lastWords.includes(' ') && searchText.includes(lastWords);
+      
+      // 3. Single word match the prefix
+      const singleWordMatch = !lastWords.includes(' ') 
+        && lastWord.length >= 2 
+        && s.text.toLowerCase().startsWith(lastWord);
+      
+      textMatch = startMatch || twoWordMatch || singleWordMatch;
+    }
     
-    return keyMatch || prefixMatch;
+    return keyMatch || textMatch;
   });
 
   if (matches.length > 0) {
