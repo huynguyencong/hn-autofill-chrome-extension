@@ -160,7 +160,7 @@ function getCaretCoordinates(element) {
 
 function showSuggestions(matches, rect, caretCoords) {
   suggestionBox.innerHTML = '';
-  selectedIndex = -1;
+  selectedIndex = 0; // Set to first option by default
 
   matches.forEach((match, index) => {
     const div = document.createElement('div');
@@ -187,6 +187,7 @@ function showSuggestions(matches, rect, caretCoords) {
   });
 
   suggestionBox.style.display = 'block';
+  updateSelection(); // Apply highlighting to the first option
   
   // Position relative to caret instead of input field
   const inputRect = currentInput.getBoundingClientRect();
