@@ -111,11 +111,10 @@ function handleInput(inputElement) {
     
     // Check for matches in the sentence
     let textMatch = false;
+    const searchText = s.text.toLowerCase();
+    
     if (lastWords.length >= 2) {
-      const searchText = s.text.toLowerCase();
-      
-      // Match scenarios:
-      // 1. Beginning of sentence (as before)
+      // 1. Beginning of sentence
       const startMatch = searchText.startsWith(lastWord);
       
       // 2. Two consecutive words anywhere in the sentence
@@ -124,12 +123,37 @@ function handleInput(inputElement) {
       // 3. Single word match the prefix
       const singleWordMatch = !lastWords.includes(' ') 
         && lastWord.length >= 2 
-        && s.text.toLowerCase().startsWith(lastWord);
+        && searchText.startsWith(lastWord);
       
       textMatch = startMatch || twoWordMatch || singleWordMatch;
     }
+
+    // 4. Abbreviation match (e.g., "hbt" matches "Happy Birthday To you")
+    let abbreviationMatch = false;
+    if (lastWord.length >= 3 && !lastWords.includes(' ')) {
+      const words = s.text.split(/\s+/);
+      let letterIndex = 0;
+      let matchedLetters = '';
+      
+      // Try to match input characters with first letters of words
+      for (const word of words) {
+        if (letterIndex < lastWord.length && 
+            word.charAt(0).toLowerCase() === lastWord[letterIndex].toLowerCase()) {
+          matchedLetters += word.charAt(0).toLowerCase();
+          letterIndex++;
+        }
+      }
+      
+      // Also try matching consecutive characters from the start of any word
+      const wordStartMatches = words.some(word => {
+        const firstChars = word.slice(0, lastWord.length).toLowerCase();
+        return firstChars === lastWord.toLowerCase();
+      });
+      
+      abbreviationMatch = matchedLetters === lastWord.toLowerCase() || wordStartMatches;
+    }
     
-    return keyMatch || textMatch;
+    return keyMatch || textMatch || abbreviationMatch;
   });
 
   if (matches.length > 0) {
