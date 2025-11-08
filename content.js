@@ -67,9 +67,11 @@ document.addEventListener('keydown', (e) => {
       e.preventDefault();
       navigateSuggestions('down');
       break;
-    case 'Enter':
-      e.preventDefault();
-      applySuggestion();
+    case 'Tab':
+      if (suggestionBox.children.length > 0) {
+        e.preventDefault();
+        applySuggestion();
+      }
       break;
     case 'Escape':
       hideSuggestions();
