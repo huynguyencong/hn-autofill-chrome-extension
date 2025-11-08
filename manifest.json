@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Text Autofill",
+  "version": "1.0",
+  "description": "Autofill text fields with predefined sentences using keyboard shortcuts",
+  "author": "Your Name",
+  "permissions": [
+    "storage"
+  ],
+  "browser_specific_settings": {
+    "edge": {
+      "browser_action_next_to_addressbar": true
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "48": "icon.png"
+  }
+}
