@@ -115,27 +115,24 @@ function handleInput(inputElement) {
     if (s.key.length == 1) {
       keyMatch = s.key.length > 0 && textBeforeCursor.endsWith(s.key);
     } else {
-      keyMatch = lastWord.length >= 2 && s.key.toLowerCase().startsWith(lastWord);
+      keyMatch = lastWord.length >= 2 && s.key.toLowerCase().includes(normalizedLastWord);
     }
     
     // Check for matches in the sentence
     let textMatch = false;
-    const searchText = s.text.toLowerCase();
     const normalizedSearchText = normalizeText(s.text);
     
     if (normalizedLastWords.length >= 2) {
       // 1. Beginning of sentence
-      const startMatch = normalizedLastWord.length >= 2 && normalizedSearchText.startsWith(normalizedLastWord);
-      
-      // 2. Two consecutive words anywhere in the sentence
-      const twoWordMatch = normalizedLastWords.includes(' ') && normalizedSearchText.includes(normalizedLastWords);
-      
-      // 3. Single word matches the prefix
-      const singleWordMatch = !normalizedLastWords.includes(' ') 
-        && normalizedLastWord.length >= 2 
+      const startMatch = !normalizedLastWords.includes(' ')
+        && normalizedLastWord.length >= 2
         && normalizedSearchText.startsWith(normalizedLastWord);
       
-      textMatch = startMatch || twoWordMatch || singleWordMatch;
+      // 2. Two consecutive words anywhere in the sentence
+      const twoWordMatch = normalizedLastWords.includes(' ')
+        && normalizedSearchText.includes(normalizedLastWords);
+      
+      textMatch = startMatch || twoWordMatch;
     }
 
     // 4. Abbreviation match (e.g., "hbt" matches "Happy Birthday To you")
@@ -154,15 +151,8 @@ function handleInput(inputElement) {
           letterIndex++;
         }
       }
-      
-      // Also try matching consecutive characters from the start of any word
-      const wordStartMatches = words.some(word => {
-        const normalizedWord = normalizeText(word);
-        const firstChars = normalizedWord.slice(0, normalizedLastWord.length);
-        return firstChars === normalizedLastWord;
-      });
-      
-      abbreviationMatch = matchedLetters === normalizedLastWord || wordStartMatches;
+
+      abbreviationMatch = matchedLetters === normalizedLastWord;
     }
     
     return keyMatch || textMatch || abbreviationMatch;
