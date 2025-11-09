@@ -51,8 +51,7 @@
     
     if (normalizedLastWords.length >= 2) {
       // 1. Beginning of sentence
-      const startMatch = !normalizedLastWords.includes(' ')
-        && normalizedLastWord.length >= 2
+      const startMatch = normalizedLastWord.length >= 2
         && normalizedSearchText.startsWith(normalizedLastWord);
       
       // 2. Two consecutive words anywhere in the sentence
@@ -64,7 +63,7 @@
 
     // 4. Abbreviation match (e.g., "hbt" matches "Happy Birthday To you")
     let abbreviationMatch = false;
-    if (normalizedLastWord.length >= 3 && !normalizedLastWords.includes(' ')) {
+    if (normalizedLastWord.length >= 3) {
       const words = s.text.split(/\s+/);
       let letterIndex = 0;
       let matchedLetters = '';

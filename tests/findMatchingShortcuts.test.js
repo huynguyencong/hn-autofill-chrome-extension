@@ -87,6 +87,12 @@ describe('findMatchingShortcuts', () => {
       expect(matches).toContainEqual({ key: 'greeting', text: 'Hello there, how are you doing today?' });
     });
 
+    test('should match beginning of text with more characters, with some prefix', () => {
+      const text = 'Uhm Hello';
+      const matches = findMatchingShortcuts(shortcuts, text, text.length);
+      expect(matches).toContainEqual({ key: 'greeting', text: 'Hello there, how are you doing today?' });
+    });
+
     test('should not match single character prefix', () => {
       const text = 'H';
       const matches = findMatchingShortcuts(shortcuts, text, text.length);
@@ -136,6 +142,12 @@ describe('findMatchingShortcuts', () => {
   describe('Abbreviation matching', () => {
     test('should match abbreviation with 3 letters', () => {
       const text = 'hbt';
+      const matches = findMatchingShortcuts(shortcuts, text, text.length);
+      expect(matches).toContainEqual({ key: 'habitoyo', text: 'Happy Birthday To You' });
+    });
+
+    test('should match abbreviation with 3 letters with prefix', () => {
+      const text = 'Hi hbt';
       const matches = findMatchingShortcuts(shortcuts, text, text.length);
       expect(matches).toContainEqual({ key: 'habitoyo', text: 'Happy Birthday To You' });
     });
