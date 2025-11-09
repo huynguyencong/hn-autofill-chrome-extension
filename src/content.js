@@ -91,13 +91,15 @@ function normalizeText(text) {
   return text.replace(/[^a-z0-9\s]/gi, '').toLowerCase();
 }
 
-function handleInput(inputElement) {
-  currentInput = inputElement;
-  const text = inputElement.value;
-  const cursorPosition = inputElement.selectionStart;
-  const rect = inputElement.getBoundingClientRect();
-  
-  // Get text before and after cursor
+/**
+ * Find matching shortcuts based on text input
+ * @param {Array<{key: string, text: string}>} shortcuts - Array of shortcut objects
+ * @param {string} text - Full text content
+ * @param {number} cursorPosition - Current cursor position
+ * @returns {Array<{key: string, text: string}>} - Array of matching shortcuts
+ */
+function findMatchingShortcuts(shortcuts, text, cursorPosition) {
+  // Get text before cursor
   const textBeforeCursor = text.substring(0, cursorPosition);
   
   // Get the last two words being typed
@@ -109,7 +111,7 @@ function handleInput(inputElement) {
   const normalizedLastWords = normalizeText(lastWords);
   const normalizedLastWord = normalizeText(lastWord);
   
-  const matches = shortcuts.filter(s => {
+  return shortcuts.filter(s => {
     // Check for exact shortcut key match before cursor
     let keyMatch = false;
     if (s.key.length == 1) {
@@ -157,6 +159,16 @@ function handleInput(inputElement) {
     
     return keyMatch || textMatch || abbreviationMatch;
   });
+}
+
+function handleInput(inputElement) {
+  currentInput = inputElement;
+  const text = inputElement.value;
+  const cursorPosition = inputElement.selectionStart;
+  const rect = inputElement.getBoundingClientRect();
+  
+  // Use extracted matching function
+  const matches = findMatchingShortcuts(shortcuts, text, cursorPosition);
 
   if (matches.length > 0) {
     // Position the suggestion box relative to cursor position
